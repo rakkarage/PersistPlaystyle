@@ -1,5 +1,4 @@
--- PersistPlaystyle.lua
--- Remembers and restores your LFG playstyle selection across sessions.
+-- 💾 PersistPlaystyle: Remembers and restores your LFG playstyle selection across sessions.
 
 local ADDON_NAME = "PersistPlaystyle"
 local DEFAULT_PLAYSTYLE = "Relaxed"
@@ -101,6 +100,7 @@ end)
 --   /pps relaxed  → override saved playstyle
 -------------------------------------------------------------------------------
 SLASH_PERSISTPLAYSTYLE1 = "/pps"
+SLASH_PERSISTPLAYSTYLE1 = "/persistplaystyle"
 SlashCmdList["PERSISTPLAYSTYLE"] = function(msg)
 	msg = strtrim(msg or "")
 	if msg == "" then
