@@ -1,123 +1,54 @@
 -- 💾 PersistPlaystyle: Remembers and restores your LFG playstyle selection across sessions.
 
-local ADDON_NAME = "PersistPlaystyle"
-local DEFAULT_PLAYSTYLE = "Relaxed"
+local addonName, ns = ...
 
-local PLAYSTYLE_IDS = {
-	["Learning"]      = 1,
-	["Relaxed"]       = 2,
-	["Competitive"]   = 3,
-	["Carry Offered"] = 4,
-}
+local PersistPlaystyle = {}
+PersistPlaystyle.__index = PersistPlaystyle
 
-local VALID_PLAYSTYLES = {
-	["Learning"]      = true,
-	["Relaxed"]       = true,
-	["Competitive"]   = true,
-	["Carry Offered"] = true,
-}
+PersistPlaystyle.DEFAULT_PLAYSTYLE = "Relaxed"
+PersistPlaystyle.PLAYSTYLE_IDS = { ["Learning"] = 1, ["Relaxed"] = 2, ["Competitive"] = 3, ["Carry Offered"] = 4 }
 
--------------------------------------------------------------------------------
--- Saved-variable initialisation
--------------------------------------------------------------------------------
-local function InitDB()
-	if type(PersistPlaystyleDB) ~= "table" then
-		PersistPlaystyleDB = {}
-	end
-	if not VALID_PLAYSTYLES[PersistPlaystyleDB.playstyle] then
-		PersistPlaystyleDB.playstyle = DEFAULT_PLAYSTYLE
-	end
+function PersistPlaystyle:InitDB()
+	if type(PersistPlaystyleDB) ~= "table" then PersistPlaystyleDB = {} end
+	if not self.PLAYSTYLE_IDS[PersistPlaystyleDB.playstyle] then PersistPlaystyleDB.playstyle = self.DEFAULT_PLAYSTYLE end
 end
 
--------------------------------------------------------------------------------
--- Apply the saved text to the dropdown button
--------------------------------------------------------------------------------
-local function ApplySavedPlaystyle()
-	local entryCreation = LFGListFrame and LFGListFrame.EntryCreation
-	-- Ensure the frame exists and is actually open/visible
-	if not entryCreation or not entryCreation:IsShown() then return end
-
-	local saved = PersistPlaystyleDB.playstyle or DEFAULT_PLAYSTYLE
-	local styleID = PLAYSTYLE_IDS[saved]
-
+function PersistPlaystyle:ApplySavedPlaystyle()
+	local ec = LFGListFrame and LFGListFrame.EntryCreation
+	if not ec or not ec:IsShown() then return end
+	local saved = PersistPlaystyleDB.playstyle or self.DEFAULT_PLAYSTYLE
+	local styleID = self.PLAYSTYLE_IDS[saved]
 	if styleID then
-		-- 1. Set the internal state (this fixes the "List Group" button being greyed out)
-		entryCreation.generalPlaystyle = styleID
-
-		-- 2. Update the visual text on the dropdown button
-		entryCreation.PlayStyleDropdown:SetText(saved)
-
-		-- 3. Force the UI to re-evaluate if the form is complete
-		LFGListEntryCreation_UpdateValidState(entryCreation)
+		ec.generalPlaystyle = styleID
+		ec.PlayStyleDropdown:SetText(saved)
+		LFGListEntryCreation_UpdateValidState(ec)
 	end
 end
 
--------------------------------------------------------------------------------
--- Hook: watch for the creation panel opening and intercept SetText
--------------------------------------------------------------------------------
-local hooked = false
-
-local function HookCreationPanel()
-	if hooked then return end
-
-	local dropdown = LFGListFrame and LFGListFrame.EntryCreation and LFGListFrame.EntryCreation.PlayStyleDropdown
-	if not dropdown then return end
-
-	-- Save whenever Blizzard (or the user) changes the dropdown text
-	hooksecurefunc(dropdown, "SetText", function(self, text)
-		if VALID_PLAYSTYLES[text] then
-			PersistPlaystyleDB.playstyle = text
-		end
+function PersistPlaystyle:HookCreationPanel()
+	if self._hooked then return end
+	local dd = LFGListFrame and LFGListFrame.EntryCreation and LFGListFrame.EntryCreation.PlayStyleDropdown
+	if not dd then return end
+	hooksecurefunc(dd, "SetText", function(_, text)
+		if PersistPlaystyle.PLAYSTYLE_IDS[text] then PersistPlaystyleDB.playstyle = text end
 	end)
-
-	-- Restore whenever the create panel opens
-	LFGListFrame.EntryCreation:HookScript("OnShow", function()
-		C_Timer.After(0, ApplySavedPlaystyle)
-	end)
-
-	hooked = true
+	LFGListFrame.EntryCreation:HookScript("OnShow", function() C_Timer.After(0, function() self:ApplySavedPlaystyle() end) end)
+	self._hooked = true
 end
 
--------------------------------------------------------------------------------
--- Event frame
--------------------------------------------------------------------------------
-local frame = CreateFrame("Frame")
-
-frame:RegisterEvent("ADDON_LOADED")
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-frame:SetScript("OnEvent", function(self, event, arg1)
-	if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
-		InitDB()
+function PersistPlaystyle:OnEvent(event, arg1)
+	if event == "ADDON_LOADED" and arg1 == addonName then
+		self:InitDB()
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		HookCreationPanel()
+		self:HookCreationPanel()
 	end
-end)
-
--------------------------------------------------------------------------------
--- Slash command: /pps
---   /pps          → print current saved playstyle
---   /pps relaxed  → override saved playstyle
--------------------------------------------------------------------------------
-SLASH_PERSISTPLAYSTYLE1 = "/pps"
-SLASH_PERSISTPLAYSTYLE1 = "/persistplaystyle"
-SlashCmdList["PERSISTPLAYSTYLE"] = function(msg)
-	msg = strtrim(msg or "")
-	if msg == "" then
-		print("|cff00ccff[PersistPlaystyle]|r Saved playstyle: " .. (PersistPlaystyleDB.playstyle or DEFAULT_PLAYSTYLE))
-		return
-	end
-
-	for label in pairs(VALID_PLAYSTYLES) do
-		if label:lower() == msg:lower() then
-			PersistPlaystyleDB.playstyle = label
-			print("|cff00ccff[PersistPlaystyle]|r Playstyle set to: " .. label)
-			ApplySavedPlaystyle()
-			return
-		end
-	end
-
-	print("|cff00ccff[PersistPlaystyle]|r Unknown playstyle. Valid options: Learning, Relaxed, Competitive, Carry Offered")
 end
 
-print("|cff00ccff[PersistPlaystyle]|r loaded. Use /pps to check or change your saved playstyle.")
+function PersistPlaystyle:Enable()
+	local frame = CreateFrame("Frame")
+	frame:RegisterEvent("ADDON_LOADED")
+	frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+	frame:SetScript("OnEvent", function(_, event, arg1) self:OnEvent(event, arg1) end)
+end
+
+PersistPlaystyle:Enable()
