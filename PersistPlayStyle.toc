@@ -1,0 +1,11 @@
+## Title: PersistPlaystyle
+## Notes: Saves (persists) LFG Playstle setting.
+## Category: User Interface
+## Author: rakkarage
+## SavedVariables: PersistPlaystyleDB
+## AddonCompartmentFunc: PersistPlaystyle_Settings
+## IconTexture: Interface/AddOns/PersistPlaystyle/PersistPlaystyle.png
+## Interface: 120001
+## Version: v2026.4
+
+PersistPlaystyle.lua
