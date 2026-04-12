@@ -2,7 +2,8 @@
 
 local addonName, ns = ...
 
-local PersistPlaystyle = {}
+ns.PersistPlaystyle = {}
+local PersistPlaystyle = ns.PersistPlaystyle
 PersistPlaystyle.__index = PersistPlaystyle
 
 PersistPlaystyle.DEFAULT_PLAYSTYLE = "Relaxed"
