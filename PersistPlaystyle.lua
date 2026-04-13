@@ -4,7 +4,6 @@ local addonName, ns = ...
 
 ns.PersistPlaystyle = {}
 local PersistPlaystyle = ns.PersistPlaystyle
-PersistPlaystyle.__index = PersistPlaystyle
 
 PersistPlaystyle.DEFAULT_PLAYSTYLE = "Relaxed"
 PersistPlaystyle.PLAYSTYLE_IDS = { ["Learning"] = 1, ["Relaxed"] = 2, ["Competitive"] = 3, ["Carry Offered"] = 4 }
