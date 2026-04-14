@@ -1,5 +1,5 @@
 ## Title: PersistPlaystyle
-## Notes: Saves (persists) LFG Playstle setting.
+## Notes: Remembers and restores your LFG playstyle selection across sessions.
 ## Category: User Interface
 ## Author: rakkarage
 ## SavedVariables: PersistPlaystyleDB
