@@ -1,8 +1,7 @@
 -- 💾 PersistPlaystyle: Remembers and restores your LFG playstyle selection across sessions.
 
 local addonName, ns = ...
-
-ns.PersistPlaystyle = {}
+ns.PersistPlaystyle = CreateFrame("Frame")
 local PersistPlaystyle = ns.PersistPlaystyle
 
 PersistPlaystyle.DEFAULT_PLAYSTYLE = "Relaxed"
@@ -44,11 +43,6 @@ function PersistPlaystyle:OnEvent(event, arg1)
 	end
 end
 
-function PersistPlaystyle:Enable()
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("ADDON_LOADED")
-	frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-	frame:SetScript("OnEvent", function(_, event, arg1) self:OnEvent(event, arg1) end)
-end
-
-PersistPlaystyle:Enable()
+PersistPlaystyle:RegisterEvent("ADDON_LOADED")
+PersistPlaystyle:RegisterEvent("PLAYER_ENTERING_WORLD")
+PersistPlaystyle:SetScript("OnEvent", function(_, event, arg1) PersistPlaystyle:OnEvent(event, arg1) end)
