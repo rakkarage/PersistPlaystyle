@@ -4,14 +4,10 @@ local addonName, ns = ...
 
 ns.PersistPlaystyle = CreateFrame("Frame")
 local PersistPlaystyle = ns.PersistPlaystyle
+PersistPlaystyle.name = addonName
 
 PersistPlaystyle.DEFAULT_PLAYSTYLE = "Relaxed"
 PersistPlaystyle.PLAYSTYLE_IDS = { ["Learning"] = 1, ["Relaxed"] = 2, ["Competitive"] = 3, ["Carry Offered"] = 4 }
-
-function PersistPlaystyle:InitDB()
-	if type(PersistPlaystyleDB) ~= "table" then PersistPlaystyleDB = {} end
-	if not self.PLAYSTYLE_IDS[PersistPlaystyleDB.playstyle] then PersistPlaystyleDB.playstyle = self.DEFAULT_PLAYSTYLE end
-end
 
 function PersistPlaystyle:ApplySavedPlaystyle()
 	local ec = LFGListFrame and LFGListFrame.EntryCreation
@@ -41,8 +37,10 @@ PersistPlaystyle:RegisterEvent("PLAYER_ENTERING_WORLD")
 PersistPlaystyle:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
 		local name = ...
-		if name ~= addonName then return end
-		self:InitDB()
+		if name ~= self.name then return end
+
+		if type(PersistPlaystyleDB) ~= "table" then PersistPlaystyleDB = {} end
+		if not self.PLAYSTYLE_IDS[PersistPlaystyleDB.playstyle] then PersistPlaystyleDB.playstyle = self.DEFAULT_PLAYSTYLE end
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		self:HookCreationPanel()
 	end
