@@ -30,7 +30,7 @@ function PersistPlaystyle:HookCreationPanel()
 	local dd = LFGListFrame and LFGListFrame.EntryCreation and LFGListFrame.EntryCreation.PlayStyleDropdown
 	if not dd then return end
 	hooksecurefunc(dd, "SetText", function(_, text)
-		if PersistPlaystyle.PLAYSTYLE_IDS[text] then PersistPlaystyleDB.playstyle = text end
+		if self.PLAYSTYLE_IDS[text] then PersistPlaystyleDB.playstyle = text end
 	end)
 	LFGListFrame.EntryCreation:HookScript("OnShow", function() C_Timer.After(0, function() self:ApplySavedPlaystyle() end) end)
 	self._hooked = true
