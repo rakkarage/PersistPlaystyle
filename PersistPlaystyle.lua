@@ -36,14 +36,14 @@ function PersistPlaystyle:HookCreationPanel()
 	self._hooked = true
 end
 
-function PersistPlaystyle:OnEvent(event, arg1)
-	if event == "ADDON_LOADED" and arg1 == addonName then
+PersistPlaystyle:RegisterEvent("ADDON_LOADED")
+PersistPlaystyle:RegisterEvent("PLAYER_ENTERING_WORLD")
+PersistPlaystyle:SetScript("OnEvent", function(self, event, ...)
+	if event == "ADDON_LOADED" then
+		local name = ...
+		if name ~= addonName then return end
 		self:InitDB()
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		self:HookCreationPanel()
 	end
-end
-
-PersistPlaystyle:RegisterEvent("ADDON_LOADED")
-PersistPlaystyle:RegisterEvent("PLAYER_ENTERING_WORLD")
-PersistPlaystyle:SetScript("OnEvent", function(_, event, arg1) PersistPlaystyle:OnEvent(event, arg1) end)
+end)
