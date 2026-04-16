@@ -1,6 +1,7 @@
 -- 💾 PersistPlaystyle: Remembers and restores your LFG playstyle selection across sessions.
 
 local addonName, ns = ...
+
 ns.PersistPlaystyle = CreateFrame("Frame")
 local PersistPlaystyle = ns.PersistPlaystyle
 
