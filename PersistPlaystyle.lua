@@ -1,10 +1,10 @@
 -- 💾 PersistPlaystyle: Remembers and restores your LFG playstyle selection across sessions.
 
-local addonName, _ = ...
+local _addonName = ...
 
-local frame = CreateFrame("Frame")
+local _frame = CreateFrame("Frame")
 
-local hooked = false
+local _hooked = false
 
 local DEFAULT_PLAYSTYLE = "Relaxed"
 local PLAYSTYLE_DATA = { ["Learning"] = 1, ["Relaxed"] = 2, ["Competitive"] = 3, ["Carry Offered"] = 4 }
@@ -35,7 +35,7 @@ local function SaveCurrentPlaystyle()
 end
 
 local function InitializeHooks()
-	if hooked then return end
+	if _hooked then return end
 
 	local ec = LFGListFrame and LFGListFrame.EntryCreation
 	if not ec then return end
@@ -46,12 +46,12 @@ local function InitializeHooks()
 
 	ec:HookScript("OnHide", SaveCurrentPlaystyle)
 
-	hooked = true
+	_hooked = true
 end
 
-frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(_, event, name)
-	if event == "ADDON_LOADED" and name == addonName then
+_frame:RegisterEvent("ADDON_LOADED")
+_frame:SetScript("OnEvent", function(_, event, name)
+	if event == "ADDON_LOADED" and name == _addonName then
 		PersistPlaystyleDB = PersistPlaystyleDB or {}
 		if not PLAYSTYLE_DATA[PersistPlaystyleDB.playstyle] then
 			PersistPlaystyleDB.playstyle = DEFAULT_PLAYSTYLE
