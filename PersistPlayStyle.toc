@@ -4,7 +4,7 @@
 ## Author: rakkarage
 ## SavedVariables: PersistPlaystyleDB
 ## IconTexture: Interface/AddOns/PersistPlaystyle/PersistPlaystyle.png
-## Interface: 120001
+## Interface: 120005
 ## Version: v2026.4
 
 PersistPlaystyle.lua
